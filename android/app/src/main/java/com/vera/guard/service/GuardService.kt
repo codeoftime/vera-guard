@@ -48,6 +48,7 @@ import com.vera.guard.journey.JourneyCoordinator
 import com.vera.guard.journey.JourneyEvent
 import com.vera.guard.journey.JourneyMonitor
 import com.vera.guard.journey.JourneyRequest
+import com.vera.guard.journey.JourneyUiState
 import com.vera.guard.journey.LatLng
 import com.vera.guard.net.ApiClient
 import com.vera.guard.net.SessionHandle
