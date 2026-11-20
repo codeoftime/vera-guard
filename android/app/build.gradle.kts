@@ -17,8 +17,9 @@ android {
         applicationId = "com.vera.guard"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toIntOrNull() ?: 1   // CI run number, so newer builds can update older ones
         versionName = "1.0.0"
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }   // real phones only; drops ~12 MB of x86 libraries
         buildConfigField("String", "BACKEND_URL", "\"$backendUrl\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -32,6 +33,7 @@ android {
                 storePassword = System.getenv("VERA_KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("VERA_KEY_ALIAS")
                 keyPassword = System.getenv("VERA_KEY_PASSWORD")
+                enableV1Signing = true; enableV2Signing = true; enableV3Signing = true
             }
         }
     }
@@ -49,7 +51,10 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
-    packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+    packaging {
+        resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+        jniLibs { useLegacyPackaging = true }   // compressed + extracted native libs: most tolerant installer path
+    }
     testOptions { unitTests.isReturnDefaultValues = true }
 
     applicationVariants.all {
