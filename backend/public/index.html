@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><title>VERA Guard</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script></head><body>
+<header class="top" id="top"></header>
+<div class="wrap">
+<section class="hero"><h1 data-i18n="hero_h"></h1><p class="mut" data-i18n="hero_p"></p>
+<p><a id="dl" class="btn" href="/VERA-Guard.apk" data-i18n="dl"></a></p><p class="mut" style="font-size:13px" data-i18n="dl_note"></p><p id="apkmiss" class="warn" hidden></p></section>
+<div class="warn" data-i18n="notice"></div>
+<div class="card"><h2 data-i18n="how_h"></h2><ul class="g"><li data-i18n="how1"></li><li data-i18n="how2"></li><li data-i18n="how3"></li><li data-i18n="how4"></li></ul></div>
+<div class="grid"><div class="card"><h2 data-i18n="shots_h"></h2><p class="mut" data-i18n="shots_p"></p>
+<div class="phone"><div class="t">VERA Guard</div><div class="n">28</div><div class="t">Fall detected · HIGH 82</div><div class="b" data-i18n="ok"></div></div></div>
+<div class="card"><h2 data-i18n="inst_h"></h2><ol class="g steps"><li data-i18n="inst1"></li><li data-i18n="inst2"></li><li data-i18n="inst3"></li><li data-i18n="inst4"></li></ol></div></div>
+</div><footer data-i18n="notice"></footer>
+<script>
+var missing=false;function showMiss(){var m=document.getElementById('apkmiss');m.hidden=!missing;if(missing)m.textContent=VERA.t('apk_missing')}
+document.addEventListener('langchange',showMiss);
+fetch('/VERA-Guard.apk',{method:'HEAD'}).then(function(r){if(!r.ok)throw 0}).catch(function(){missing=true;if(window.VERA)showMiss()});
+</script></body></html>

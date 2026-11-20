@@ -1,0 +1,77 @@
+name: Build VERA-Guard.apk
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      backend_url:
+        description: "Backend URL baked into the app (default: repo variable BACKEND_URL)"
+        required: false
+
+permissions:
+  contents: write   # to publish the APK as a GitHub Release asset
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Backend tests
+        uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: cd backend && npm ci && npm test
+
+      - name: Create release signing key (stable per repo if VERA_KEYSTORE_B64 secret is set)
+        working-directory: android
+        env:
+          KS_B64: ${{ secrets.VERA_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.VERA_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ] && [ -n "$KS_PASS" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/vera.jks"; PASS="$KS_PASS"
+          else
+            PASS="$(openssl rand -hex 12)"
+            keytool -genkeypair -keystore "$RUNNER_TEMP/vera.jks" -alias vera -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PASS" -keypass "$PASS" -dname "CN=VERA Guard, O=VERA, C=IN"
+            echo "::notice::Generated a one-off signing key. To update the app over an older install, set secrets VERA_KEYSTORE_B64 and VERA_KEYSTORE_PASSWORD."
+          fi
+          echo "VERA_KEYSTORE=$RUNNER_TEMP/vera.jks"  >> "$GITHUB_ENV"
+          echo "VERA_KEYSTORE_PASSWORD=$PASS"          >> "$GITHUB_ENV"
+          echo "VERA_KEY_ALIAS=vera"                    >> "$GITHUB_ENV"
+          echo "VERA_KEY_PASSWORD=$PASS"                >> "$GITHUB_ENV"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit tests + release APK
+        working-directory: android
+        env:
+          BACKEND_URL: ${{ github.event.inputs.backend_url || vars.BACKEND_URL || 'https://vera-guard.onrender.com' }}
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleRelease -PbackendUrl="$BACKEND_URL"
+
+      - name: Verify APK
+        run: |
+          APK=android/app/build/outputs/apk/release/VERA-Guard.apk
+          ls -l "$APK"
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" | head -3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VERA-Guard-apk
+          path: android/app/build/outputs/apk/release/VERA-Guard.apk
+          if-no-files-found: error
+
+      - name: Publish as release "latest" (stable download link)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest android/app/build/outputs/apk/release/VERA-Guard.apk \
+            --title "VERA Guard (latest build)" --notes "Built from ${GITHUB_SHA::7}. Install on Android: enable 'install unknown apps' for your browser."

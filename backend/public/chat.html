@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><title>Ask VERA</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script></head><body>
+<header class="top" id="top"></header><div class="wrap"><h1 data-i18n="chat_h"></h1><p class="mut" data-i18n="chat_p"></p>
+<div class="warn" data-i18n="notice"></div>
+<div class="card"><div class="chat-log" id="log"></div></div>
+<div class="row chips" style="margin-bottom:8px"><button data-q="c1"></button><button data-q="c2"></button><button data-q="c3"></button></div>
+<form id="f" class="row" style="flex-wrap:nowrap"><input id="q" maxlength="600" data-i18n-ph="chat_ph" autocomplete="off"><button class="btn" data-i18n="send"></button></form></div>
+<script>
+var hist=[];var log=document.getElementById('log');
+function add(c,t){var d=document.createElement('div');d.className='msg '+c;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+function lab(){document.querySelectorAll('.chips button').forEach(function(b){b.textContent=VERA.t(b.dataset.q)})}
+document.addEventListener('langchange',lab);
+function ask(t){if(!t)return;add('u',t);hist.push({role:'user',content:t});var w=add('a','…');
+ fetch('/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({lang:VERA.lang(),messages:hist.slice(-8)})}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){
+  if(!x.ok)throw 0;w.textContent=x.j.reply;hist.push({role:'assistant',content:x.j.reply})}).catch(function(){w.textContent=VERA.t('chat_err')})}
+document.getElementById('f').onsubmit=function(e){e.preventDefault();var i=document.getElementById('q');var v=i.value.trim();i.value='';ask(v)};
+document.querySelectorAll('.chips button').forEach(function(b){b.onclick=function(){ask(VERA.t(b.dataset.q))}});
+</script></body></html>

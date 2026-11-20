@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><title>Caregiver dashboard</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script></head><body>
+<header class="top" id="top"></header><div class="wrap"><h1 data-i18n="dash_h"></h1><p class="mut" data-i18n="dash_p"></p>
+<form id="f" class="row" style="flex-wrap:nowrap"><input id="o" autocomplete="off"><button class="btn" data-i18n="dash_go"></button></form>
+<div id="out"></div></div>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function ft(ts){return ts?new Date(ts).toLocaleString():'-'}
+var code=new URLSearchParams(location.search).get('owner')||localStorage.getItem('owner')||'';document.getElementById('o').value=code;
+function load(){var c=document.getElementById('o').value.trim();if(!c)return;localStorage.setItem('owner',c);
+ fetch('/api/dashboard?owner='+encodeURIComponent(c)).then(function(r){return r.json()}).then(function(d){
+  var T=VERA.t,h='<div class="card"><h2>'+esc(T('dash_sessions'))+'</h2>';
+  if(!d.sessions||!d.sessions.length)h+='<p class="mut">'+esc(T('none'))+'</p>';else{h+='<table><tr><th>'+esc(T('when'))+'</th><th>'+esc(T('type'))+'</th><th>'+esc(T('status'))+'</th><th></th></tr>';
+   d.sessions.forEach(function(s){var sev=s.event&&s.event.severity?' · '+esc(s.event.severity)+' '+esc(s.event.score):'';h+='<tr><td>'+esc(ft(s.created_at))+'</td><td>'+esc(s.kind)+sev+'</td><td><span class="chip '+esc(s.status)+'">'+esc(s.acked_at?'responder_on_way':s.status)+'</span></td><td><a href="/track/'+encodeURIComponent(s.token)+'">'+esc(T('open'))+'</a></td></tr>'});h+='</table>'}
+  h+='</div><div class="card"><h2>'+esc(T('dash_journeys'))+'</h2>';
+  if(!d.journeys||!d.journeys.length)h+='<p class="mut">'+esc(T('none'))+'</p>';else{h+='<table><tr><th>'+esc(T('when'))+'</th><th>'+esc(T('dest'))+'</th><th>'+esc(T('status'))+'</th><th></th></tr>';
+   d.journeys.forEach(function(s){h+='<tr><td>'+esc(ft(s.started_at))+'</td><td>'+esc(s.dest_name)+'</td><td><span class="chip '+esc(s.status)+'">'+esc(s.status)+'</span></td><td><a href="/track/'+encodeURIComponent(s.token)+'">'+esc(T('open'))+'</a></td></tr>'});h+='</table>'}
+  document.getElementById('out').innerHTML=h+'</div>'}).catch(function(){document.getElementById('out').innerHTML='<p class="warn">'+esc(VERA.t('notfound'))+'</p>'})}
+document.getElementById('f').onsubmit=function(e){e.preventDefault();load()};document.addEventListener('langchange',load);
+</script></body></html>

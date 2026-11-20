@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><title>VERA Guard · Live</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="/assets/site.js" defer></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script></head><body>
+<header class="top" id="top"></header>
+<div class="wrap" id="root"><p class="mut" data-i18n="loading"></p></div>
+<footer data-i18n="notice"></footer>
+<script>
+var TOKEN=decodeURIComponent(location.pathname.split('/').pop());
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function tel(p){return String(p||'').replace(/[^\d+]/g,'')}
+function safeUrl(u){return /^https?:\/\//.test(u||'')?u:'#'}
+var map,layers,data,timer;
+function kv(rows){return '<div class="kv">'+rows.map(function(r){return '<div>'+esc(r[0])+'</div><div>'+esc(r[1])+'</div>'}).join('')+'</div>'}
+function facList(title,list,L){if(!list||!list.length)return '';
+ return '<h2 style="margin-top:10px">'+esc(title)+'</h2>'+list.map(function(f){
+  var d=f.distanceM>=1000?(f.distanceM/1000).toFixed(1)+' km':f.distanceM+' m';
+  return '<div class="fac"><div><b>'+esc(f.name)+'</b><div class="mut" style="font-size:13px">'+esc(d)+(f.emergency?' · 24x7/ER':'')+(f.address?' · '+esc(f.address):'')+'</div></div><div class="row noprint">'+
+   (f.phone?'<a class="btn sec" style="padding:8px 12px;font-size:14px" href="tel:'+esc(tel(f.phone))+'">'+esc(L.call)+'</a>':'')+
+   '<a class="btn sec" style="padding:8px 12px;font-size:14px" target="_blank" rel="noopener" href="'+esc(safeUrl(f.directionsUrl))+'">'+esc(L.directions)+'</a></div></div>'}).join('')}
+function briefHtml(b){var L=b.labels,h=b.header,html='';
+ html+='<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><div><h1 style="margin:0">'+esc(h.typeLabel)+(h.demo?' (DEMO)':'')+'</h1><div class="mut">'+esc(h.time)+' · '+esc(h.minutesAgo)+'</div></div><span class="chip '+esc(h.status)+'">'+esc(h.statusLabel)+'</span></div>'+
+  '<p style="font-size:17px;margin-top:10px">'+esc(b.summary)+'</p>'+(b.summaryAi?'<p class="mut" style="font-size:12px">'+esc(b.aiLabel)+'</p>':'')+'</div>';
+ html+='<button id="ack" class="btn big ok noprint" '+(h.acked?'disabled':'')+'>'+esc(h.acked?L.acked:L.seen)+'</button>';
+ html+='<div class="card"><h2>'+esc(b.patient.title)+'</h2>'+kv(b.patient.fields.map(function(f){return [f.label,f.value]}));
+ if(b.patient.contacts.length)html+='<div style="margin-top:8px">'+b.patient.contacts.map(function(c){return '<a class="btn sec noprint" style="margin:3px;padding:8px 12px;font-size:14px" href="tel:'+esc(tel(c.phone))+'">'+esc(L.call)+' '+esc(c.name)+(c.relationship?' ('+esc(c.relationship)+')':'')+'</a>'}).join('')+'</div>';
+ html+='</div>';
+ if(b.analysis)html+='<div class="card"><h2>'+esc(b.analysis.title)+' <span class="chip '+esc(b.analysis.level)+'">'+esc(b.analysis.level)+' '+esc(b.analysis.score)+'</span></h2>'+kv(b.analysis.rows.map(function(r){return [r.label,r.value]}))+'<p><b>'+esc(b.analysis.interpretation)+'</b></p></div>';
+ var lc=b.location;html+='<div class="card"><h2>'+esc(L.location)+'</h2>';
+ if(lc.unknown)html+='<p>'+esc(lc.unknown)+'</p>';else html+=kv([[L.address,lc.address],[L.coords,lc.lat.toFixed(5)+', '+lc.lng.toFixed(5)],[L.accuracy,lc.accuracy==null?'?':'±'+Math.round(lc.accuracy)+' m'],[L.lastUpdate,lc.ageSec==null?'?':lc.ageSec+' s'],['🔋',lc.battery==null?'?':lc.battery+'%']])+
+  '<p class="row noprint"><a class="btn sec" target="_blank" rel="noopener" href="'+esc(safeUrl(lc.directionsUrl))+'">'+esc(L.directions)+'</a><a class="btn sec" target="_blank" rel="noopener" href="'+esc(safeUrl(lc.osmUrl))+'">OSM</a></p>';
+ html+='<div id="map"></div></div>';
+ html+='<div class="card"><h2>'+esc(b.nearby.title)+'</h2>'+(facList(L.hospitals,b.nearby.hospitals,L)+facList(L.clinics,b.nearby.clinics,L)+facList(L.pharmacies,b.nearby.pharmacies,L)||'<p class="mut">'+esc(b.header&&'Unknown')+'</p>')+'</div>';
+ html+='<div class="card"><h2>'+esc(L.guidance)+'</h2><ul class="g">'+b.guidance.map(function(g){return '<li>'+esc(g)+'</li>'}).join('')+'</ul></div>';
+ html+='<p class="noprint"><button class="btn sec" onclick="window.print()">'+esc(VERA.t('print'))+'</button></p>';
+ return html}
+function journeyHtml(j){var L=j.labels;var eta=new Date(j.etaTs).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+ var h='<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><div><h1 style="margin:0">'+esc(L.title)+'</h1><div class="mut">'+esc(j.name||'')+' → '+esc(j.dest.name||'')+'</div></div><span class="chip '+esc(j.status)+'">'+esc(j.statusLabel)+'</span></div>'+
+  kv([[L.eta,eta],[L.battery,j.battery==null?'?':j.battery+'%'],['',j.online?'':L.offline]])+'</div>';
+ h+='<div class="card"><div id="map"></div></div>';
+ if(j.cab&&(j.cab.vehicle||j.cab.driver))h+='<div class="card"><h2>'+esc(L.cab)+'</h2>'+kv([[L.vehicle,j.cab.vehicle||'?'],[L.driver,j.cab.driver||'?']])+'</div>';
+ if(j.phone)h+='<a class="btn big noprint" href="tel:'+esc(tel(j.phone))+'">'+esc(L.callName)+'</a>';
+ return h}
+function drawMap(pts){if(!window.L)return;var el=document.getElementById('map');if(!el)return;
+ if(map){map.remove();map=null}
+ map=L.map(el);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+ var all=[];pts.forEach(function(p){if(p.line&&p.line.length>1){L.polyline(p.line,{color:p.color,weight:p.weight||4,dashArray:p.dash}).addTo(map);all=all.concat(p.line)}
+  if(p.marker){L.circleMarker(p.marker,{radius:8,color:p.color,fillOpacity:.9}).addTo(map).bindTooltip(p.tip||'');all.push(p.marker)}});
+ if(all.length)map.fitBounds(all,{padding:[30,30],maxZoom:16});else map.setView([20.6,78.9],4)}
+function render(){if(!data)return;var root=document.getElementById('root');var pts=[];var html;
+ if(data.type==='journey'&&!data.brief){html=journeyHtml(data);pts.push({line:data.planned,color:'#3b82f6',dash:'6 6'},{line:data.path,color:'#2fb877'});
+  if(data.dest.lat!=null)pts.push({marker:[data.dest.lat,data.dest.lng],color:'#f5a524',tip:data.dest.name});if(data.current)pts.push({marker:[data.current.lat,data.current.lng],color:'#e5484d',tip:data.name})}
+ else{var b=data.brief;html=(data.type==='journey'?journeyHtml(data).split('<div class="card"><div id="map">')[0]:'')+briefHtml(b);
+  if(b.journey)pts.push({line:b.journey.planned,color:'#3b82f6',dash:'6 6'});pts.push({line:b.path,color:'#e5484d'});
+  if(b.location&&b.location.lat!=null)pts.push({marker:[b.location.lat,b.location.lng],color:'#e5484d',tip:b.header.typeLabel})}
+ root.innerHTML=html;drawMap(pts);var a=document.getElementById('ack');if(a&&data.brief||a&&data.type==='session')a.onclick=ack}
+function ack(){var tk=data.type==='session'?TOKEN:(data.brief&&data.brief.id);fetch('/sessions/'+encodeURIComponent(tk)+'/ack',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}).then(load)}
+function load(){fetch('/api/track/'+encodeURIComponent(TOKEN)+'?lang='+VERA.lang()).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){data=d;render()}).catch(function(){document.getElementById('root').innerHTML='<div class="warn">'+esc(VERA.t('notfound'))+'</div>';clearInterval(timer)})}
+document.addEventListener('langchange',load);window.addEventListener('load',function(){timer=setInterval(load,10000)});
+</script></body></html>
