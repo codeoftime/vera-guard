@@ -58,7 +58,7 @@ jobs:
       - name: Unit tests + release APK
         working-directory: android
         env:
-          BACKEND_URL: ${{ github.event.inputs.backend_url || vars.BACKEND_URL || 'https://vera-guard.onrender.com' }}
+          BACKEND_URL: ${{ github.event.inputs.backend_url || vars.BACKEND_URL || 'https://vera-guard-backend.vercel.app' }}
         run: ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleRelease -PbackendUrl="$BACKEND_URL"
 
       - name: Verify APK

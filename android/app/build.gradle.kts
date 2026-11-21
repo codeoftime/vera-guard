@@ -7,7 +7,7 @@ plugins {
 }
 
 // Backend URL baked into the APK (override at build time: -PbackendUrl=https://your-host). Also editable in Settings.
-val backendUrl: String = (project.findProperty("backendUrl") as String?) ?: "https://vera-guard.onrender.com"
+val backendUrl: String = (project.findProperty("backendUrl") as String?) ?: "https://vera-guard-backend.vercel.app"
 
 android {
     namespace = "com.vera.guard"

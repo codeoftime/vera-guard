@@ -107,3 +107,11 @@ Android vendors aggressively stop background apps. In the app, Home → checklis
 Profile fields are shared only when enabled under **Profile → Sharing**; location is shared only during an active alert or journey. Data on the phone is encrypted
 (Keystore-backed preferences, SQLCipher database). **Profile → Security → Delete all my data** wipes the phone and removes sessions/journeys from the server.
 Sessions are also purged by server retention (`SESSION_TTL_HOURS`, default 72 h).
+
+
+## Hosting note (Vercel vs. Docker/Render)
+
+The backend is deployed on Vercel at https://vera-guard-backend.vercel.app (entry: `backend/api/index.js`, config: `backend/vercel.json`).
+Vercel functions are stateless: the SQLite file lives in `/tmp` per instance and the watchdog timer cannot run. That means website, APK download, Nearby and Ask VERA work,
+but **tracking links can disappear between requests and the Safe Journey dead-man's-switch will not fire**. For those, deploy with `render.yaml` / `backend/Dockerfile` (persistent disk + always-on process).
+SMS and phone calls on a fall or SOS are sent by the phone itself and do not depend on the server.
