@@ -18,6 +18,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -89,6 +92,7 @@ class GuardService : Service(), SensorEventListener {
     @Inject lateinit var sms: SmsSender
     @Inject lateinit var hub: SensorHub
     private var lastHubAt = 0L
+    private var sensorWake: PowerManager.WakeLock? = null
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var sensors: SensorManager
@@ -123,6 +127,7 @@ class GuardService : Service(), SensorEventListener {
         goForeground(guardNotification())
         sensors = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         registerSensors()
+        holdSensorWake()
         scope.launch { settings.settings.collect { applySettings() } }
     }
 
@@ -176,9 +181,10 @@ class GuardService : Service(), SensorEventListener {
             lastHubAt = nowMs
             val gx9 = s.ax / com.vera.guard.detect.DetectionConfig.G; val gy9 = s.ay / com.vera.guard.detect.DetectionConfig.G
             val dps = s.gyro * 57.29578f
-            hub.update { it.copy(running = true, g = s.g, ax = gx9, ay = gy9, gyroDps = dps, detector = detector.state.name, lastSampleMs = nowMs) }
+            val sp = shake.progress
+            hub.update { it.copy(running = true, g = s.g, ax = gx9, ay = gy9, gyroDps = dps, detector = detector.state.name, lastSampleMs = nowMs, shake = sp) }
         }
-        if (cfg.shakeEnabled && !sosActive && shake.onSample(s)) { triggerSos(simulate = false); return }
+        if (cfg.shakeEnabled && !sosActive && shake.onSample(s)) { hub.update { it.copy(shake = 1f, lastTriggerMs = nowMs) }; buzz(); triggerSos(simulate = false); return }
         if (!cfg.fallEnabled) return
         if (detector.state == DetectorState.ALERTING) return
         when (detector.onSample(s)) {
@@ -542,6 +548,25 @@ class GuardService : Service(), SensorEventListener {
         }
     }
 
+    /** One short, discreet vibration so the user knows the gesture was recognised. */
+    @Suppress("DEPRECATION")
+    private fun buzz() {
+        try {
+            val v: Vibrator = if (Build.VERSION.SDK_INT >= 31) (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator else getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE))
+        } catch (e: Exception) { }
+    }
+
+    /** Keeps the CPU awake so the accelerometer keeps delivering samples with the screen off. */
+    @SuppressLint("WakelockTimeout")
+    private fun holdSensorWake() {
+        try {
+            if (sensorWake?.isHeld == true) return
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            sensorWake = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "vera:sensors").also { it.setReferenceCounted(false); it.acquire() }
+        } catch (e: Exception) { }
+    }
+
     @SuppressLint("WakelockTimeout")
     private fun acquireWakeLock(ms: Long) {
         releaseWakeLock()
@@ -553,7 +578,9 @@ class GuardService : Service(), SensorEventListener {
     override fun onDestroy() {
         hub.update { it.copy(running = false) }
         sensors.unregisterListener(this)
-        feedback?.stop(); stopKeyword(); releaseWakeLock(); scope.cancel()
+        feedback?.stop(); stopKeyword(); releaseWakeLock()
+        try { if (sensorWake?.isHeld == true) sensorWake?.release() } catch (e: Exception) { }
+        scope.cancel()
         super.onDestroy()
     }
 

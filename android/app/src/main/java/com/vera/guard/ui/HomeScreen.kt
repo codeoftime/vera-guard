@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -85,6 +86,7 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
     val events by vm.events.collectAsStateWithLifecycle()
     val sensor by vm.sensors.status.collectAsStateWithLifecycle()
     val sirenOn by vm.siren.on.collectAsStateWithLifecycle()
+    val contacts by vm.profiles.contacts.collectAsStateWithLifecycle()
     var tick by remember { mutableIntStateOf(0) }
     var sliderScore by remember { mutableFloatStateOf(70f) }
     var showHelplines by remember { mutableStateOf(false) }
@@ -118,9 +120,10 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
     )
     val states = remember(tick) { steps.map { it.granted(ctx) } }
     // Critical = notifications, location, SMS. The rest improve reliability.
-    val active = states[0] && states[1] && states[3]
+    val hasRecipient = if (s.demoMode) s.demoPhone.isNotBlank() else contacts.isNotEmpty()
+    val active = states[0] && states[1] && states[3] && states[4] && hasRecipient
     val ready = states.count { it }
-    val critical = listOf(0, 1, 3)
+    val critical = listOf(0, 1, 3, 4)
 
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // ---- hero
@@ -133,6 +136,11 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
                 StatusPill(stringResource(if (active) R.string.pill_protected else R.string.pill_setup), if (active) VeraGreen else VeraAmber, pulsing = active)
             }
         }
+        if (!hasRecipient) SectionCard {
+            Text(stringResource(R.string.no_contact_title), color = VeraRed, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.no_contact_body), style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = { onNavigate(4) }) { Text(stringResource(R.string.no_contact_btn)) }
+        }
         if (s.demoMode) SectionCard { Text(stringResource(R.string.demo_banner), color = VeraAmber, fontWeight = FontWeight.Bold); Text(stringResource(R.string.demo_hint), style = MaterialTheme.typography.bodySmall) }
 
         // Active silent SOS: stop it with the real PIN (the duress PIN fakes a cancel)
@@ -141,6 +149,7 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
                 if (st.fakeCancelled) Text(stringResource(R.string.sos_cancelled), fontWeight = FontWeight.Bold)
                 else {
                     st.trackUrl?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                    st.steps.forEach { code -> stepText(code)?.let { t -> Text(t, style = MaterialTheme.typography.bodyMedium) } }
                     var pin by remember { mutableStateOf("") }
                     var wrong by remember { mutableStateOf(false) }
                     if (vm.coordinator.hasAnyPin()) {
@@ -172,6 +181,9 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
                         "CONFIRMING" -> R.string.det_confirm; "ALERTING" -> R.string.det_alert; else -> R.string.det_idle
                     }),
                 )
+                Text(stringResource(R.string.sensor_shake), style = MaterialTheme.typography.labelMedium)
+                androidx.compose.material3.LinearProgressIndicator(progress = { sensor.shake }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)), color = if (sensor.shake >= 1f) VeraRed else VeraTeal)
+                if (nowMs - sensor.lastTriggerMs < 8000 && sensor.lastTriggerMs > 0) Text(stringResource(R.string.shake_sent), color = VeraRed, fontWeight = FontWeight.Bold)
                 if (!sensor.hasGyro) Text(stringResource(R.string.sensor_nogyro), style = MaterialTheme.typography.bodySmall, color = VeraAmber)
                 Text(stringResource(R.string.sensor_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -285,5 +297,19 @@ fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
             },
             confirmButton = { TextButton(onClick = { showHelplines = false }) { Text(stringResource(R.string.close)) } },
         )
+    }
+}
+
+@Composable
+private fun stepText(code: String): String? {
+    val arg = code.substringAfter(':', "")
+    return when (code.substringBefore(':')) {
+        "location" -> stringResource(if (arg == "ok") R.string.step_loc_ok else R.string.step_loc_none)
+        "contacts" -> stringResource(R.string.step_contacts_none)
+        "sms" -> stringResource(R.string.step_sms, arg)
+        "sms2" -> stringResource(R.string.step_sms2, arg)
+        "call" -> stringResource(if (arg == "failed") R.string.step_call_failed else R.string.step_call_ok, arg)
+        "session" -> stringResource(if (arg == "ok") R.string.step_session_ok else R.string.step_session_failed)
+        else -> null
     }
 }

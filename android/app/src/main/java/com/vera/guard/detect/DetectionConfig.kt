@@ -32,9 +32,9 @@ object DetectionConfig {
     const val BUFFER_MS = 5000L
 
     // Shake gesture: SHAKE_COUNT hard shakes (each = two strokes) within SHAKE_WINDOW_MS
-    const val SHAKE_COUNT = 4
-    const val SHAKE_WINDOW_MS = 3000L
-    const val SHAKE_STROKE_MS2 = 15.0f      // m/s^2 of high-passed acceleration per stroke (~1.5 g)
+    const val SHAKE_COUNT = 3
+    const val SHAKE_WINDOW_MS = 3500L
+    const val SHAKE_STROKE_MS2 = 13.0f      // m/s^2 of high-passed acceleration per stroke (~1.3 g)
     const val SHAKE_MIN_GAP_MS = 80L
     const val SHAKE_MAX_GAP_MS = 700L
 

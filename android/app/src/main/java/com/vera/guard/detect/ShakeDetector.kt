@@ -15,6 +15,9 @@ class ShakeDetector {
     private val lastSign = IntArray(3)
     private val lastStrokeAt = LongArray(3)
 
+    /** 0..1 progress towards a complete shake gesture (for the live sensor panel). */
+    val progress: Float get() = (strokeTimes.size.toFloat() / (2 * C.SHAKE_COUNT - 1)).coerceIn(0f, 1f)
+
     fun reset() { strokeTimes.clear(); lastSign.fill(0); lastStrokeAt.fill(0); primed = false }
 
     /** Returns true when the shake gesture is complete (state resets afterwards). */

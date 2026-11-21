@@ -143,6 +143,9 @@
     <string name="mode_car">कार</string>
     <string name="mode_walking">पैदल</string>
     <string name="nearby_error">आस-पास की जगहें लोड नहीं हो सकीं। इंटरनेट और लोकेशन जाँचें।</string>
+    <string name="no_contact_body">संपर्क के बिना गिरने या SOS पर किसी को संदेश या कॉल नहीं जाएगा। कम से कम एक भरोसेमंद व्यक्ति का फ़ोन नंबर जोड़ें।</string>
+    <string name="no_contact_btn">संपर्क जोड़ें</string>
+    <string name="no_contact_title">कोई आपातकालीन संपर्क नहीं जोड़ा</string>
     <string name="no_contacts">अभी कोई संपर्क नहीं। प्रोफ़ाइल में जोड़ें।</string>
     <string name="no_events">अभी तक कोई इवेंट नहीं</string>
     <string name="no_location">आपकी लोकेशन नहीं मिल सकी। GPS चालू करके फिर कोशिश करें।</string>
@@ -204,6 +207,7 @@
     <string name="sensor_none">इस फ़ोन में एक्सेलेरोमीटर नहीं है, इसलिए गिरना और शेक पहचान यहाँ काम नहीं करेगी।</string>
     <string name="sensor_off">बंद है</string>
     <string name="sensor_rotation">घूर्णन (°/s)</string>
+    <string name="sensor_shake">शेक जेस्चर (फ़ोन को ज़ोर से 3 बार हिलाएँ)</string>
     <string name="sensor_start">शुरू करें</string>
     <string name="sensor_state">डिटेक्टर</string>
     <string name="sensor_title">मोशन सेंसर</string>
@@ -226,6 +230,7 @@
     <string name="set_tile">क्विक सेटिंग्स टाइल</string>
     <string name="set_widget">होम स्क्रीन विजेट</string>
     <string name="setup_checklist">सेटअप चेकलिस्ट</string>
+    <string name="shake_sent">शेक पहचाना गया: SOS शुरू</string>
     <string name="share_link">ट्रैकिंग लिंक साझा करें</string>
     <string name="sharing_hint">चुनें कि अलर्ट के दौरान आपके संपर्क और सहायक क्या देख सकते हैं। अलर्ट या यात्रा सक्रिय न हो तो कुछ भी साझा नहीं होता।</string>
     <string name="sharing_note">सक्रिय अलर्ट के दौरान लोकेशन हमेशा शामिल रहती है।</string>
@@ -254,6 +259,15 @@
     <string name="st_stopped">बहुत देर से रुके हैं</string>
     <string name="start_fake_call">नकली कॉल शुरू करें</string>
     <string name="start_journey">यात्रा शुरू करें</string>
+    <string name="step_call_failed">कॉल नहीं लग सकी। फ़ोन की अनुमति दें।</string>
+    <string name="step_call_ok">%s को कॉल किया जा रहा है</string>
+    <string name="step_contacts_none">कोई आपातकालीन संपर्क नहीं, इसलिए किसी को सूचना नहीं गई।</string>
+    <string name="step_loc_none">लोकेशन नहीं मिली। GPS चालू करें और लोकेशन की अनुमति दें।</string>
+    <string name="step_loc_ok">लोकेशन मिल गई</string>
+    <string name="step_session_failed">लाइव लिंक उपलब्ध नहीं (सर्वर बंद)। SMS में फिर भी मैप लिंक है।</string>
+    <string name="step_session_ok">लाइव ट्रैकिंग लिंक तैयार</string>
+    <string name="step_sms">लोकेशन के साथ SMS भेजे गए: %s</string>
+    <string name="step_sms2">लाइव लिंक के साथ दूसरा SMS भेजा गया: %s</string>
     <string name="stop_sos">SOS बंद करें</string>
     <string name="tab_chat">VERA से पूछें</string>
     <string name="tab_home">होम</string>

@@ -143,6 +143,9 @@
     <string name="mode_car">ಕಾರು</string>
     <string name="mode_walking">ನಡಿಗೆ</string>
     <string name="nearby_error">ಹತ್ತಿರದ ಸ್ಥಳಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಮತ್ತು ಸ್ಥಳ ಪರಿಶೀಲಿಸಿ.</string>
+    <string name="no_contact_body">ಸಂಪರ್ಕವಿಲ್ಲದೆ ಬೀಳುವಿಕೆ ಅಥವಾ SOS ಬಂದಾಗ ಯಾರಿಗೂ ಸಂದೇಶ ಅಥವಾ ಕರೆ ಹೋಗುವುದಿಲ್ಲ. ನಂಬಿಕಸ್ಥ ಒಬ್ಬರ ಫೋನ್ ಸಂಖ್ಯೆ ಸೇರಿಸಿ.</string>
+    <string name="no_contact_btn">ಸಂಪರ್ಕ ಸೇರಿಸಿ</string>
+    <string name="no_contact_title">ಯಾವುದೇ ತುರ್ತು ಸಂಪರ್ಕ ಸೇರಿಸಿಲ್ಲ</string>
     <string name="no_contacts">ಇನ್ನೂ ಸಂಪರ್ಕಗಳಿಲ್ಲ. ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ ಸೇರಿಸಿ.</string>
     <string name="no_events">ಇನ್ನೂ ಯಾವುದೇ ಘಟನೆಗಳಿಲ್ಲ</string>
     <string name="no_location">ನಿಮ್ಮ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. GPS ಆನ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
@@ -204,6 +207,7 @@
     <string name="sensor_none">ಈ ಫೋನ್‌ನಲ್ಲಿ ಆಕ್ಸೆಲೆರೋಮೀಟರ್ ಇಲ್ಲ, ಆದ್ದರಿಂದ ಬೀಳುವಿಕೆ ಮತ್ತು ಶೇಕ್ ಪತ್ತೆ ಇಲ್ಲಿ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ.</string>
     <string name="sensor_off">ನಡೆಯುತ್ತಿಲ್ಲ</string>
     <string name="sensor_rotation">ತಿರುಗುವಿಕೆ (°/s)</string>
+    <string name="sensor_shake">ಶೇಕ್ ಸನ್ನೆ (ಫೋನ್ ಅನ್ನು ಜೋರಾಗಿ 3 ಬಾರಿ ಅಲುಗಿಸಿ)</string>
     <string name="sensor_start">ಪ್ರಾರಂಭಿಸಿ</string>
     <string name="sensor_state">ಡಿಟೆಕ್ಟರ್</string>
     <string name="sensor_title">ಮೋಷನ್ ಸೆನ್ಸರ್‌ಗಳು</string>
@@ -226,6 +230,7 @@
     <string name="set_tile">ಕ್ವಿಕ್ ಸೆಟ್ಟಿಂಗ್ಸ್ ಟೈಲ್</string>
     <string name="set_widget">ಹೋಮ್ ಸ್ಕ್ರೀನ್ ವಿಜೆಟ್</string>
     <string name="setup_checklist">ಸೆಟಪ್ ಪರಿಶೀಲನಾ ಪಟ್ಟಿ</string>
+    <string name="shake_sent">ಶೇಕ್ ಗುರುತಿಸಲಾಗಿದೆ: SOS ಆರಂಭ</string>
     <string name="share_link">ಟ್ರ್ಯಾಕಿಂಗ್ ಲಿಂಕ್ ಹಂಚಿಕೊಳ್ಳಿ</string>
     <string name="sharing_hint">ಎಚ್ಚರಿಕೆಯ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಸಂಪರ್ಕಗಳು ಮತ್ತು ರಕ್ಷಕರು ಏನನ್ನು ನೋಡಬಹುದು ಎಂದು ಆಯ್ಕೆಮಾಡಿ. ಎಚ್ಚರಿಕೆ ಅಥವಾ ಪ್ರಯಾಣ ಸಕ್ರಿಯವಾಗಿಲ್ಲದಿದ್ದರೆ ಏನೂ ಹಂಚಿಕೆಯಾಗುವುದಿಲ್ಲ.</string>
     <string name="sharing_note">ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆಯ ಸಮಯದಲ್ಲಿ ಸ್ಥಳ ಯಾವಾಗಲೂ ಸೇರಿರುತ್ತದೆ.</string>
@@ -254,6 +259,15 @@
     <string name="st_stopped">ತುಂಬಾ ಹೊತ್ತು ನಿಂತಿದೆ</string>
     <string name="start_fake_call">ನಕಲಿ ಕರೆ ಪ್ರಾರಂಭಿಸಿ</string>
     <string name="start_journey">ಪ್ರಯಾಣ ಪ್ರಾರಂಭಿಸಿ</string>
+    <string name="step_call_failed">ಕರೆ ಮಾಡಲಾಗಲಿಲ್ಲ. ಫೋನ್ ಅನುಮತಿ ನೀಡಿ.</string>
+    <string name="step_call_ok">%s ಗೆ ಕರೆ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+    <string name="step_contacts_none">ತುರ್ತು ಸಂಪರ್ಕವಿಲ್ಲ, ಆದ್ದರಿಂದ ಯಾರಿಗೂ ಸೂಚನೆ ಹೋಗಿಲ್ಲ.</string>
+    <string name="step_loc_none">ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. GPS ಆನ್ ಮಾಡಿ ಮತ್ತು ಸ್ಥಳದ ಅನುಮತಿ ನೀಡಿ.</string>
+    <string name="step_loc_ok">ಸ್ಥಳ ಸಿಕ್ಕಿದೆ</string>
+    <string name="step_session_failed">ಲೈವ್ ಲಿಂಕ್ ಲಭ್ಯವಿಲ್ಲ (ಸರ್ವರ್ ಆಫ್). SMS ನಲ್ಲಿ ನಕ್ಷೆ ಲಿಂಕ್ ಇದೆ.</string>
+    <string name="step_session_ok">ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಲಿಂಕ್ ಸಿದ್ಧ</string>
+    <string name="step_sms">ಸ್ಥಳದೊಂದಿಗೆ SMS ಕಳುಹಿಸಲಾಗಿದೆ: %s</string>
+    <string name="step_sms2">ಲೈವ್ ಲಿಂಕ್‌ನೊಂದಿಗೆ ಎರಡನೇ SMS ಕಳುಹಿಸಲಾಗಿದೆ: %s</string>
     <string name="stop_sos">SOS ನಿಲ್ಲಿಸಿ</string>
     <string name="tab_chat">VERA ಕೇಳಿ</string>
     <string name="tab_home">ಮುಖಪುಟ</string>

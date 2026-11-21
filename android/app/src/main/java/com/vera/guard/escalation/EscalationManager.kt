@@ -90,25 +90,52 @@ class EscalationManager @Inject constructor(
         val s = settings.current
         val demo = s.demoMode
         step("start:${req.type.api}")
-        // 1. location
-        val fix = loc.current(8000)
+        val contacts = recipients()
+        if (contacts.isEmpty()) step("contacts:none")
+        // 1. location (falls back to last known, so this is quick even indoors)
+        val fix = loc.current(6000)
         step(if (fix != null) "location:ok" else "location:none")
 
-        // 2. nearby facilities without blocking the flow
-        val nearbyDeferred = scope.async {
-            if (fix == null) null else withTimeoutOrNull(5000) {
-                try { api.nearby(fix.latitude, fix.longitude, 5000) } catch (e: Exception) { null }
+        // 2. IMMEDIATE alert, before any network work: SMS with a map link to every contact, then call the primary contact.
+        //    A slow or unreachable backend must never delay or block these.
+        val shared = profiles.sharedFields()
+        val battery = Battery.percent(ctx)
+        val timeText = SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault()).format(Date())
+        val name = shared["name"]?.toString() ?: profiles.profile.value.fullName.ifBlank { "VERA user" }
+        val mapUrl = fix?.let { String.format(Locale.US, "https://maps.google.com/?q=%.6f,%.6f", it.latitude, it.longitude) }
+        var smsCount = 0
+        for (c in contacts) {
+            val text = SmsBuilder.alert(c.lang, name, timeText, req.type, req.severity, req.score, null, null, battery, emptyList(), demo, mapUrl)
+            if (sms.send(c.phone, text)) smsCount++
+        }
+        step("sms:$smsCount/${contacts.size}")
+
+        var called = false
+        val first = contacts.firstOrNull()
+        if (first != null) { called = calls.place(first.phone); step(if (called) "call:${first.name}" else "call:failed") }
+        if (req.silent && contacts.size > 1) {
+            scope.launch {
+                delay(30_000)
+                if (calls.isIdle()) { calls.place(contacts[1].phone); step("call2:${contacts[1].name}") }
             }
         }
-        val nearbyJson = withTimeoutOrNull(5500) { nearbyDeferred.await() }
+
+        // 3. ambulance: never in demo mode; never for silent triggers (a call screen would reveal the phone). The alert screen performs the dial.
+        val amb = s.emergencyNumber.ifBlank { "112" }
+        if (!demo && !req.silent) {
+            coordinator.update { it.copy(ambulanceNumber = amb, ambulanceNeedsManualCall = false) }
+            step("ambulance:$amb")
+        }
+
+        // 4. nearby facilities (short timeout)
+        val nearbyJson = if (fix == null) null else withTimeoutOrNull(5500) {
+            try { api.nearby(fix.latitude, fix.longitude, 5000) } catch (e: Exception) { null }
+        }
         val facilities = parseFacilities(nearbyJson)
         if (nearbyJson != null && nearbyJson.optBoolean("ok", false)) nearbyDao.put(NearbyCacheEntity("last", nearbyJson.toString(), System.currentTimeMillis()))
         step("nearby:${facilities.size}")
 
-        // 3. backend session
-        val shared = profiles.sharedFields()
-        val contacts = recipients()
-        val battery = Battery.percent(ctx)
+        // 5. backend session (live tracking + responder brief)
         val eventJson = JSONObject().apply {
             put("kind", req.type.api); put("ts", System.currentTimeMillis())
             req.severity?.let { put("severity", it) }; req.score?.let { put("score", it) }
@@ -128,38 +155,19 @@ class EscalationManager @Inject constructor(
             put("facilities", nearbyJson ?: JSONObject.NULL)
             req.journeyToken?.let { put("journeyToken", it) }
         }
-        val handle = try { api.createSession(body) } catch (e: Exception) { null }
+        val handle = try { withTimeoutOrNull(9000) { api.createSession(body) } } catch (e: Exception) { null }
         _session.value = handle
         step(if (handle != null) "session:ok" else "session:failed")
         coordinator.update { it.copy(trackUrl = handle?.url, briefUrl = handle?.briefUrl) }
 
-        // 4. SMS every contact in their own language
-        var smsCount = 0
-        val timeText = SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault()).format(Date())
-        val name = shared["name"]?.toString() ?: profiles.profile.value.fullName.ifBlank { "VERA user" }
-        for (c in contacts) {
-            val text = if (handle != null) SmsBuilder.alert(c.lang, name, timeText, req.type, req.severity, req.score, handle.url, handle.briefUrl, battery, facilities, demo)
-            else SmsBuilder.shortAlert(c.lang, req.type, req.severity, req.score, fix?.latitude, fix?.longitude, shared["bloodGroup"]?.toString(), facilities.firstOrNull()?.name)
-            if (sms.send(c.phone, text)) smsCount++
-        }
-        step("sms:$smsCount/${contacts.size}")
-
-        // 5. call
-        var called = false
-        val first = contacts.firstOrNull()
-        if (first != null) { called = calls.place(first.phone); step(if (called) "call:${first.name}" else "call:failed") }
-        if (req.silent && contacts.size > 1) {
-            scope.launch {
-                delay(30_000)
-                if (calls.isIdle()) { calls.place(contacts[1].phone); step("call2:${contacts[1].name}") }
+        // 6. follow-up SMS with the live tracking link, responder brief and nearest hospitals
+        if (handle != null || facilities.isNotEmpty()) {
+            var n = 0
+            for (c in contacts) {
+                val text = SmsBuilder.alert(c.lang, name, timeText, req.type, req.severity, req.score, handle?.url, handle?.briefUrl, battery, facilities, demo, mapUrl)
+                if (sms.send(c.phone, text)) n++
             }
-        }
-
-        // 6. ambulance: never in demo mode; never for silent triggers (a call screen would reveal the phone). The alert screen performs the dial.
-        val amb = s.emergencyNumber.ifBlank { "112" }
-        if (!demo && !req.silent) {
-            coordinator.update { it.copy(ambulanceNumber = amb, ambulanceNeedsManualCall = false) }
-            step("ambulance:$amb")
+            step("sms2:$n/${contacts.size}")
         }
 
         events.insert(EventLogEntity(ts = System.currentTimeMillis(), type = req.type.api, severity = req.severity, score = req.score, details = eventJson.toString(), trackUrl = handle?.url))

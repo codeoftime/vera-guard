@@ -39,6 +39,15 @@ class SmsBuilderTest {
         assertTrue(s.contains("12.97160,77.59460")); assertTrue(s.contains("Blood group: B+")); assertTrue(s.contains("City Hospital")); assertTrue(s.length < 160)
         assertFalse(SmsBuilder.shortAlert("en", EventType.SOS, null, null, 1.0, 2.0, null, null).contains("Blood"))
     }
+    @Test fun alertCarriesMapLinkBeforeAnyBackendLink() {
+        val map = "https://maps.google.com/?q=12.971600,77.594600"
+        val s = SmsBuilder.alert("en", "Asha", "now", EventType.SOS, null, null, null, null, null, emptyList(), false, map)
+        assertTrue(s.contains(map)); assertFalse(s.contains("Live location"))
+        assertTrue(SmsBuilder.alert("hi", "Asha", "now", EventType.SOS, null, null, null, null, null, emptyList(), false, map).contains(map))
+    }
+    @Test fun shortSmsHasMapLink() {
+        assertTrue(SmsBuilder.shortAlert("en", EventType.SOS, null, null, 12.9716, 77.5946, null, null).contains("https://maps.google.com/?q=12.97160,77.59460"))
+    }
     @Test fun journeyMessages() {
         for (l in listOf("en", "hi", "kn")) {
             val s = SmsBuilder.journeyStart(l, "Asha", "Office", "06:10 pm", "https://v.test/track/j")

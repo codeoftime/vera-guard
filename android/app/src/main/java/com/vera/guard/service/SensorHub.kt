@@ -15,6 +15,8 @@ data class SensorStatus(
     val gyroDps: Float = 0f,      // rotation speed, degrees per second
     val detector: String = "IDLE",
     val lastSampleMs: Long = 0L,
+    val shake: Float = 0f,        // 0..1 progress of the shake-to-SOS gesture
+    val lastTriggerMs: Long = 0L, // elapsedRealtime of the last motion-triggered SOS
 )
 
 /** Live sensor readings published by GuardService (throttled) so the UI can show that motion sensing really works. */

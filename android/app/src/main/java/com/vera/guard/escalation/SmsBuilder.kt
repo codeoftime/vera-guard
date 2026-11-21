@@ -35,17 +35,20 @@ object SmsBuilder {
         ),
     )
 
+    private fun mapLabel(lang: String) = when (lang) { "hi" -> "लोकेशन"; "kn" -> "ಸ್ಥಳ"; else -> "Location" }
+
     private fun pack(lang: String) = packs[lang] ?: packs.getValue("en")
 
     fun alert(
         lang: String, userName: String, timeText: String, type: EventType, severity: String?, score: Int?,
-        trackUrl: String?, briefUrl: String?, battery: Int?, hospitals: List<Facility>, demo: Boolean,
+        trackUrl: String?, briefUrl: String?, battery: Int?, hospitals: List<Facility>, demo: Boolean, mapUrl: String? = null,
     ): String {
         val p = pack(lang)
         val sb = StringBuilder()
         if (demo) sb.append(p.demo)
         sb.append(p.head(userName, timeText, p.types.getValue(type)))
         if (severity != null && score != null && (type == EventType.FALL || type == EventType.CRASH)) sb.append(' ').append(p.severityLine(type.api, p.sev[severity] ?: severity, score))
+        if (mapUrl != null) sb.append(' ').append(mapLabel(lang)).append(": ").append(mapUrl)
         if (trackUrl != null) sb.append(' ').append(p.track).append(": ").append(trackUrl)
         if (briefUrl != null) sb.append(' ').append(p.brief).append(": ").append(briefUrl)
         if (battery != null) sb.append(' ').append(p.battery).append(' ').append(battery).append('%')
@@ -63,7 +66,7 @@ object SmsBuilder {
         val parts = ArrayList<String>()
         parts += "VERA ${p.types.getValue(type)}"
         if (severity != null && score != null) parts += "$severity $score"
-        if (lat != null && lng != null) parts += String.format(java.util.Locale.US, "%.5f,%.5f", lat, lng)
+        if (lat != null && lng != null) { parts += String.format(java.util.Locale.US, "%.5f,%.5f", lat, lng); parts += String.format(java.util.Locale.US, "https://maps.google.com/?q=%.5f,%.5f", lat, lng) }
         if (!bloodGroup.isNullOrBlank()) parts += "${p.blood}: $bloodGroup"
         if (!hospital.isNullOrBlank()) parts += hospital
         return parts.joinToString(" | ")

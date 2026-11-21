@@ -197,6 +197,22 @@ a("hl_100","Police","पुलिस","ಪೊಲೀಸ್")
 a("hl_108","Ambulance","एम्बुलेंस","ಆಂಬ್ಯುಲೆನ್ಸ್")
 a("hl_1098","Childline","चाइल्डलाइन","ಚೈಲ್ಡ್‌ಲೈನ್")
 a("hl_1930","Cyber crime","साइबर अपराध","ಸೈಬರ್ ಅಪರಾಧ")
+
+# ---- alert pipeline visibility
+a("no_contact_title","No emergency contact added","कोई आपातकालीन संपर्क नहीं जोड़ा","ಯಾವುದೇ ತುರ್ತು ಸಂಪರ್ಕ ಸೇರಿಸಿಲ್ಲ")
+a("no_contact_body","Without a contact, a fall or SOS cannot message or call anyone. Add at least one person you trust, with their phone number.","संपर्क के बिना गिरने या SOS पर किसी को संदेश या कॉल नहीं जाएगा। कम से कम एक भरोसेमंद व्यक्ति का फ़ोन नंबर जोड़ें।","ಸಂಪರ್ಕವಿಲ್ಲದೆ ಬೀಳುವಿಕೆ ಅಥವಾ SOS ಬಂದಾಗ ಯಾರಿಗೂ ಸಂದೇಶ ಅಥವಾ ಕರೆ ಹೋಗುವುದಿಲ್ಲ. ನಂಬಿಕಸ್ಥ ಒಬ್ಬರ ಫೋನ್ ಸಂಖ್ಯೆ ಸೇರಿಸಿ.")
+a("no_contact_btn","Add contact","संपर्क जोड़ें","ಸಂಪರ್ಕ ಸೇರಿಸಿ")
+a("sensor_shake","Shake gesture (shake the phone hard 3 times)","शेक जेस्चर (फ़ोन को ज़ोर से 3 बार हिलाएँ)","ಶೇಕ್ ಸನ್ನೆ (ಫೋನ್ ಅನ್ನು ಜೋರಾಗಿ 3 ಬಾರಿ ಅಲುಗಿಸಿ)")
+a("shake_sent","Shake recognised: SOS started","शेक पहचाना गया: SOS शुरू","ಶೇಕ್ ಗುರುತಿಸಲಾಗಿದೆ: SOS ಆರಂಭ")
+a("step_loc_ok","Location found","लोकेशन मिल गई","ಸ್ಥಳ ಸಿಕ್ಕಿದೆ")
+a("step_loc_none","Location unavailable. Turn on GPS and allow Location.","लोकेशन नहीं मिली। GPS चालू करें और लोकेशन की अनुमति दें।","ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. GPS ಆನ್ ಮಾಡಿ ಮತ್ತು ಸ್ಥಳದ ಅನುಮತಿ ನೀಡಿ.")
+a("step_contacts_none","No emergency contact, so nobody was alerted.","कोई आपातकालीन संपर्क नहीं, इसलिए किसी को सूचना नहीं गई।","ತುರ್ತು ಸಂಪರ್ಕವಿಲ್ಲ, ಆದ್ದರಿಂದ ಯಾರಿಗೂ ಸೂಚನೆ ಹೋಗಿಲ್ಲ.")
+a("step_sms","SMS with location sent: %s","लोकेशन के साथ SMS भेजे गए: %s","ಸ್ಥಳದೊಂದಿಗೆ SMS ಕಳುಹಿಸಲಾಗಿದೆ: %s")
+a("step_sms2","Follow-up SMS with live link sent: %s","लाइव लिंक के साथ दूसरा SMS भेजा गया: %s","ಲೈವ್ ಲಿಂಕ್‌ನೊಂದಿಗೆ ಎರಡನೇ SMS ಕಳುಹಿಸಲಾಗಿದೆ: %s")
+a("step_call_ok","Calling %s","%s को कॉल किया जा रहा है","%s ಗೆ ಕರೆ ಮಾಡಲಾಗುತ್ತಿದೆ")
+a("step_call_failed","Call could not be placed. Allow the Phone permission.","कॉल नहीं लग सकी। फ़ोन की अनुमति दें।","ಕರೆ ಮಾಡಲಾಗಲಿಲ್ಲ. ಫೋನ್ ಅನುಮತಿ ನೀಡಿ.")
+a("step_session_ok","Live tracking link ready","लाइव ट्रैकिंग लिंक तैयार","ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಲಿಂಕ್ ಸಿದ್ಧ")
+a("step_session_failed","Live link unavailable (server offline). The SMS still carries a map link.","लाइव लिंक उपलब्ध नहीं (सर्वर बंद)। SMS में फिर भी मैप लिंक है।","ಲೈವ್ ಲಿಂಕ್ ಲಭ್ಯವಿಲ್ಲ (ಸರ್ವರ್ ಆಫ್). SMS ನಲ್ಲಿ ನಕ್ಷೆ ಲಿಂಕ್ ಇದೆ.")
 for k,en,hi,kn in [
  ("sec_profile","Profile","प्रोफ़ाइल","ಪ್ರೊಫೈಲ್"),("sec_contacts","Contacts","संपर्क","ಸಂಪರ್ಕಗಳು"),("sec_sharing","Sharing","साझा करना","ಹಂಚಿಕೆ"),
  ("sec_security","Security","सुरक्षा","ಭದ್ರತೆ"),("sec_settings","Settings","सेटिंग्स","ಸೆಟ್ಟಿಂಗ್‌ಗಳು"),
