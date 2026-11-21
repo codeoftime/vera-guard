@@ -335,6 +335,8 @@ function createApp({ db = open(cfg.dbPath), deps = {} } = {}) {
   app.get('/VERA-Guard.apk', async (req, res, next) => {
     if (fs.existsSync(path.join(pub, 'VERA-Guard.apk'))) return next();
     const apkUrl = deps.apkUrl ?? cfg.apkUrl;
+    // Serverless responses are capped at ~4.5 MB, so hand the browser straight to the release asset.
+    if (process.env.VERCEL && apkUrl) return res.redirect(302, apkUrl);
     try {
       const stale = !fs.existsSync(apkCache) || Date.now() - fs.statSync(apkCache).mtimeMs > 6 * 3600e3;
       if (apkUrl && stale) {
