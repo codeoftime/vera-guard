@@ -44,6 +44,7 @@
     <string name="checkin_silent_hint">Vibrate only, no sound or voice.</string>
     <string name="checkin_text">Your journey looks unusual. Please confirm.</string>
     <string name="checkin_title">Are you okay?</string>
+    <string name="checklist_progress">%1$d of %2$d ready</string>
     <string name="chip_bleeding">Heavy bleeding</string>
     <string name="chip_call">Call my contact</string>
     <string name="chip_cpr">How to do CPR</string>
@@ -51,6 +52,7 @@
     <string name="chip_hospital">Nearest hospital</string>
     <string name="chip_journey">Start a journey</string>
     <string name="clinics">Clinics</string>
+    <string name="close">Close</string>
     <string name="closed">Closed</string>
     <string name="conditions">Medical conditions</string>
     <string name="confirm">Confirm</string>
@@ -66,6 +68,12 @@
     <string name="demo_phone">Demo phone number</string>
     <string name="demo_tools">Demo tools</string>
     <string name="destination">Destination</string>
+    <string name="det_alert">Alerting</string>
+    <string name="det_confirm">Confirming</string>
+    <string name="det_freefall">Free-fall</string>
+    <string name="det_idle">Watching</string>
+    <string name="det_impact">Impact</string>
+    <string name="det_still">Checking stillness</string>
     <string name="directions">Directions</string>
     <string name="disclaimer_emergency">VERA Guard assists but cannot guarantee help. In an emergency always call 112 or 108.</string>
     <string name="dob">Date of birth (YYYY-MM-DD)</string>
@@ -92,6 +100,8 @@
     <string name="fake_call">Fake call</string>
     <string name="fake_call_name">Fake call caller name</string>
     <string name="fall_detected">Possible fall detected</string>
+    <string name="fc_hint">The screen will look like an incoming call from %s.</string>
+    <string name="fc_ring_in">Ring in</string>
     <string name="filter_all">All</string>
     <string name="followers">Who follows this journey</string>
     <string name="full_name">Full name</string>
@@ -103,6 +113,15 @@
     <string name="height_cm">Height (cm)</string>
     <string name="height_ftin">Height (ft.in)</string>
     <string name="help_alerted">Your contacts have been alerted. Stay where you are if it is safe.</string>
+    <string name="hero_tagline">Silent safety, always on</string>
+    <string name="hide">Hide</string>
+    <string name="hl_100">Police</string>
+    <string name="hl_108">Ambulance</string>
+    <string name="hl_1091">Women in distress</string>
+    <string name="hl_1098">Childline</string>
+    <string name="hl_112">National emergency number</string>
+    <string name="hl_181">Women Helpline</string>
+    <string name="hl_1930">Cyber crime</string>
     <string name="home_address">Home address</string>
     <string name="hospitals">Hospitals</string>
     <string name="i_need_help">I NEED HELP</string>
@@ -151,6 +170,8 @@
     <string name="phone">Phone</string>
     <string name="pick_follower">Choose at least one follower</string>
     <string name="pick_photo">Choose photo</string>
+    <string name="pill_protected">PROTECTED</string>
+    <string name="pill_setup">SETUP NEEDED</string>
     <string name="pin_hint">The cancel PIN stops a false alarm. Without a PIN anyone holding the phone can cancel.</string>
     <string name="pin_label">PIN to cancel</string>
     <string name="pin_wrong">Wrong PIN</string>
@@ -177,6 +198,16 @@
     <string name="sec_sharing">Sharing</string>
     <string name="send">Send</string>
     <string name="sensitivity_hint">Higher catches more falls but may cause more false alarms.</string>
+    <string name="sensor_force">Force (g)</string>
+    <string name="sensor_hint">Move or tilt your phone and watch the graph react. A real shake sends a real SOS, so use Demo mode in Settings to test safely.</string>
+    <string name="sensor_live">LIVE</string>
+    <string name="sensor_nogyro">No gyroscope found. Detection still works using the accelerometer.</string>
+    <string name="sensor_none">This phone has no accelerometer, so fall and shake detection cannot work here.</string>
+    <string name="sensor_off">NOT RUNNING</string>
+    <string name="sensor_rotation">Rotation (°/s)</string>
+    <string name="sensor_start">Start</string>
+    <string name="sensor_state">Detector</string>
+    <string name="sensor_title">Motion sensors</string>
     <string name="server_url">Server URL</string>
     <string name="set_audio">Record audio during SOS</string>
     <string name="set_audio_hint">Short clips are uploaded to the server. Android may block background recording on some phones.</string>
@@ -200,6 +231,7 @@
     <string name="sharing_hint">Choose what your contacts and responders can see during an alert. Nothing is shared unless an alert or journey is active.</string>
     <string name="sharing_note">Location is always included during an active alert.</string>
     <string name="sharing_preview">Preview: what responders will see</string>
+    <string name="show">Show</string>
     <string name="sim_dead">Simulate phone dying</string>
     <string name="sim_dead_hint">Stops location updates; the server alerts followers after the watchdog time.</string>
     <string name="sim_dead_msg">Simulating a dead phone: location updates stopped. The server watchdog should alert your followers.</string>
@@ -213,6 +245,7 @@
     <string name="sos_button">SOS</string>
     <string name="sos_cancelled">SOS cancelled</string>
     <string name="sos_hint">Press and hold for 2 seconds to send a silent SOS.</string>
+    <string name="sos_hold">Hold</string>
     <string name="speak">Read aloud</string>
     <string name="st_alert">Alert sent</string>
     <string name="st_arrived">Arrived</string>
@@ -250,6 +283,17 @@
     <string name="why_notifications">Needed to show the protection status and fall alerts.</string>
     <string name="why_phone">Needed to place the SOS call to your primary contact.</string>
     <string name="why_sms">Needed to text your emergency contacts without internet.</string>
+    <string name="ws_helplines">Helplines</string>
+    <string name="ws_nearby">Nearby help</string>
+    <string name="ws_safe_walk">Safe walk</string>
+    <string name="ws_shake_off">Shake-to-SOS is OFF</string>
+    <string name="ws_shake_on">Shake-to-SOS is ON</string>
+    <string name="ws_share">Share location</string>
+    <string name="ws_share_msg">I want you to know where I am right now: %s</string>
+    <string name="ws_siren">Loud siren</string>
+    <string name="ws_siren_stop">Stop siren</string>
+    <string name="ws_sub">Quick tools for when you feel unsafe. Tap any tile.</string>
+    <string name="ws_title">Women\'s safety</string>
     <string name="you_are_here">You are here</string>
     <string name="your_data">Your data</string>
 </resources>

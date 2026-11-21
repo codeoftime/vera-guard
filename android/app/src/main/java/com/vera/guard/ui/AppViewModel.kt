@@ -47,6 +47,8 @@ class AppViewModel @Inject constructor(
     private val nearbyDao: NearbyDao,
     private val db: AppDatabase,
     val loc: LocationHelper,
+    val sensors: com.vera.guard.service.SensorHub,
+    val siren: com.vera.guard.service.SirenController,
 ) : ViewModel() {
     private val _events = MutableStateFlow<List<EventLogEntity>>(emptyList())
     val events: StateFlow<List<EventLogEntity>> = _events.asStateFlow()

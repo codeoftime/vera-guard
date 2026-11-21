@@ -89,7 +89,7 @@ data class Consent(
 
 data class AppSettings(
     val language: String = "en",
-    val theme: String = "system",         // system | light | dark
+    val theme: String = "dark",           // system | light | dark
     val serverUrl: String = "",
     val emergencyNumber: String = "112",
     val shakeEnabled: Boolean = true,

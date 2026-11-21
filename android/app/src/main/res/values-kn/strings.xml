@@ -43,6 +43,7 @@
     <string name="checkin_silent_hint">ಕಂಪನ ಮಾತ್ರ, ಧ್ವನಿ ಇಲ್ಲ.</string>
     <string name="checkin_text">ನಿಮ್ಮ ಪ್ರಯಾಣ ಅಸಾಮಾನ್ಯವಾಗಿ ಕಾಣುತ್ತಿದೆ. ದಯವಿಟ್ಟು ದೃಢೀಕರಿಸಿ.</string>
     <string name="checkin_title">ನೀವು ಚೆನ್ನಾಗಿದ್ದೀರಾ?</string>
+    <string name="checklist_progress">%1$d / %2$d ಸಿದ್ಧ</string>
     <string name="chip_bleeding">ತೀವ್ರ ರಕ್ತಸ್ರಾವ</string>
     <string name="chip_call">ನನ್ನ ಸಂಪರ್ಕಕ್ಕೆ ಕರೆ ಮಾಡಿ</string>
     <string name="chip_cpr">CPR ಹೇಗೆ ಮಾಡುವುದು</string>
@@ -50,6 +51,7 @@
     <string name="chip_hospital">ಹತ್ತಿರದ ಆಸ್ಪತ್ರೆ</string>
     <string name="chip_journey">ಪ್ರಯಾಣ ಪ್ರಾರಂಭಿಸಿ</string>
     <string name="clinics">ಕ್ಲಿನಿಕ್‌ಗಳು</string>
+    <string name="close">ಮುಚ್ಚಿ</string>
     <string name="closed">ಮುಚ್ಚಿದೆ</string>
     <string name="conditions">ವೈದ್ಯಕೀಯ ಸ್ಥಿತಿಗಳು</string>
     <string name="confirm">ದೃಢೀಕರಿಸಿ</string>
@@ -65,6 +67,12 @@
     <string name="demo_phone">ಡೆಮೊ ಫೋನ್ ಸಂಖ್ಯೆ</string>
     <string name="demo_tools">ಡೆಮೊ ಉಪಕರಣಗಳು</string>
     <string name="destination">ಗಮ್ಯಸ್ಥಾನ</string>
+    <string name="det_alert">ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸುತ್ತಿದೆ</string>
+    <string name="det_confirm">ದೃಢೀಕರಿಸುತ್ತಿದೆ</string>
+    <string name="det_freefall">ಮುಕ್ತ ಪತನ</string>
+    <string name="det_idle">ಗಮನಿಸುತ್ತಿದೆ</string>
+    <string name="det_impact">ಡಿಕ್ಕಿ</string>
+    <string name="det_still">ಸ್ಥಿರತೆ ಪರಿಶೀಲನೆ</string>
     <string name="directions">ದಾರಿ</string>
     <string name="disclaimer_emergency">VERA Guard ಸಹಾಯ ಮಾಡುತ್ತದೆ ಆದರೆ ಸಹಾಯದ ಖಾತರಿ ನೀಡುವುದಿಲ್ಲ. ತುರ್ತು ಸಂದರ್ಭದಲ್ಲಿ ಯಾವಾಗಲೂ 112 ಅಥವಾ 108 ಗೆ ಕರೆ ಮಾಡಿ.</string>
     <string name="dob">ಹುಟ್ಟಿದ ದಿನಾಂಕ (YYYY-MM-DD)</string>
@@ -91,6 +99,8 @@
     <string name="fake_call">ನಕಲಿ ಕರೆ</string>
     <string name="fake_call_name">ನಕಲಿ ಕರೆ ಮಾಡುವವರ ಹೆಸರು</string>
     <string name="fall_detected">ಸಂಭವನೀಯ ಬೀಳುವಿಕೆ ಪತ್ತೆಯಾಗಿದೆ</string>
+    <string name="fc_hint">ಪರದೆಯು %s ಅವರಿಂದ ಬರುವ ಕರೆಯಂತೆ ಕಾಣಿಸುತ್ತದೆ.</string>
+    <string name="fc_ring_in">ಕರೆ ಬರುವುದು</string>
     <string name="filter_all">ಎಲ್ಲಾ</string>
     <string name="followers">ಈ ಪ್ರಯಾಣವನ್ನು ಯಾರು ಅನುಸರಿಸುತ್ತಾರೆ</string>
     <string name="full_name">ಪೂರ್ಣ ಹೆಸರು</string>
@@ -102,6 +112,15 @@
     <string name="height_cm">ಎತ್ತರ (ಸೆಂ.ಮೀ)</string>
     <string name="height_ftin">ಎತ್ತರ (ಅಡಿ.ಇಂಚು)</string>
     <string name="help_alerted">ನಿಮ್ಮ ಸಂಪರ್ಕಗಳಿಗೆ ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸಲಾಗಿದೆ. ಸುರಕ್ಷಿತವಾಗಿದ್ದರೆ ಅಲ್ಲಿಯೇ ಇರಿ.</string>
+    <string name="hero_tagline">ಮೌನ ಸುರಕ್ಷತೆ, ಸದಾ ಆನ್</string>
+    <string name="hide">ಮರೆಮಾಡಿ</string>
+    <string name="hl_100">ಪೊಲೀಸ್</string>
+    <string name="hl_108">ಆಂಬ್ಯುಲೆನ್ಸ್</string>
+    <string name="hl_1091">ಸಂಕಷ್ಟದಲ್ಲಿರುವ ಮಹಿಳೆಯರು</string>
+    <string name="hl_1098">ಚೈಲ್ಡ್‌ಲೈನ್</string>
+    <string name="hl_112">ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಸಂಖ್ಯೆ</string>
+    <string name="hl_181">ಮಹಿಳಾ ಸಹಾಯವಾಣಿ</string>
+    <string name="hl_1930">ಸೈಬರ್ ಅಪರಾಧ</string>
     <string name="home_address">ಮನೆ ವಿಳಾಸ</string>
     <string name="hospitals">ಆಸ್ಪತ್ರೆಗಳು</string>
     <string name="i_need_help">ನನಗೆ ಸಹಾಯ ಬೇಕು</string>
@@ -150,6 +169,8 @@
     <string name="phone">ಫೋನ್</string>
     <string name="pick_follower">ಕನಿಷ್ಠ ಒಬ್ಬ ಅನುಸರಿಸುವವರನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
     <string name="pick_photo">ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="pill_protected">ರಕ್ಷಿತ</string>
+    <string name="pill_setup">ಸೆಟಪ್ ಬೇಕು</string>
     <string name="pin_hint">ರದ್ದು PIN ಸುಳ್ಳು ಎಚ್ಚರಿಕೆಯನ್ನು ನಿಲ್ಲಿಸುತ್ತದೆ. PIN ಇಲ್ಲದಿದ್ದರೆ ಫೋನ್ ಹಿಡಿದವರು ಯಾರಾದರೂ ರದ್ದುಮಾಡಬಹುದು.</string>
     <string name="pin_label">ರದ್ದುಮಾಡಲು PIN</string>
     <string name="pin_wrong">ತಪ್ಪು PIN</string>
@@ -176,6 +197,16 @@
     <string name="sec_sharing">ಹಂಚಿಕೆ</string>
     <string name="send">ಕಳುಹಿಸಿ</string>
     <string name="sensitivity_hint">ಹೆಚ್ಚಿನ ಮೌಲ್ಯ ಹೆಚ್ಚು ಬೀಳುವಿಕೆ ಹಿಡಿಯುತ್ತದೆ ಆದರೆ ಸುಳ್ಳು ಎಚ್ಚರಿಕೆಗಳೂ ಹೆಚ್ಚಬಹುದು.</string>
+    <string name="sensor_force">ಬಲ (g)</string>
+    <string name="sensor_hint">ಫೋನ್ ಅಲುಗಿಸಿ ಅಥವಾ ಓರೆಯಾಗಿಸಿ ಮತ್ತು ಗ್ರಾಫ್ ಬದಲಾಗುವುದನ್ನು ನೋಡಿ. ನಿಜವಾದ ಶೇಕ್ ನಿಜವಾದ SOS ಕಳುಹಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ಸುರಕ್ಷಿತ ಪರೀಕ್ಷೆಗೆ ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಡೆಮೊ ಮೋಡ್ ಬಳಸಿ.</string>
+    <string name="sensor_live">ಲೈವ್</string>
+    <string name="sensor_nogyro">ಗೈರೋಸ್ಕೋಪ್ ಇಲ್ಲ. ಆಕ್ಸೆಲೆರೋಮೀಟರ್‌ನಿಂದ ಪತ್ತೆ ಇನ್ನೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.</string>
+    <string name="sensor_none">ಈ ಫೋನ್‌ನಲ್ಲಿ ಆಕ್ಸೆಲೆರೋಮೀಟರ್ ಇಲ್ಲ, ಆದ್ದರಿಂದ ಬೀಳುವಿಕೆ ಮತ್ತು ಶೇಕ್ ಪತ್ತೆ ಇಲ್ಲಿ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ.</string>
+    <string name="sensor_off">ನಡೆಯುತ್ತಿಲ್ಲ</string>
+    <string name="sensor_rotation">ತಿರುಗುವಿಕೆ (°/s)</string>
+    <string name="sensor_start">ಪ್ರಾರಂಭಿಸಿ</string>
+    <string name="sensor_state">ಡಿಟೆಕ್ಟರ್</string>
+    <string name="sensor_title">ಮೋಷನ್ ಸೆನ್ಸರ್‌ಗಳು</string>
     <string name="server_url">ಸರ್ವರ್ URL</string>
     <string name="set_audio">SOS ಸಮಯದಲ್ಲಿ ಆಡಿಯೋ ರೆಕಾರ್ಡ್ ಮಾಡಿ</string>
     <string name="set_audio_hint">ಸಣ್ಣ ಕ್ಲಿಪ್‌ಗಳನ್ನು ಸರ್ವರ್‌ಗೆ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತದೆ. ಕೆಲವು ಫೋನ್‌ಗಳಲ್ಲಿ Android ಹಿನ್ನೆಲೆ ರೆಕಾರ್ಡಿಂಗ್ ತಡೆಯಬಹುದು.</string>
@@ -199,6 +230,7 @@
     <string name="sharing_hint">ಎಚ್ಚರಿಕೆಯ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಸಂಪರ್ಕಗಳು ಮತ್ತು ರಕ್ಷಕರು ಏನನ್ನು ನೋಡಬಹುದು ಎಂದು ಆಯ್ಕೆಮಾಡಿ. ಎಚ್ಚರಿಕೆ ಅಥವಾ ಪ್ರಯಾಣ ಸಕ್ರಿಯವಾಗಿಲ್ಲದಿದ್ದರೆ ಏನೂ ಹಂಚಿಕೆಯಾಗುವುದಿಲ್ಲ.</string>
     <string name="sharing_note">ಸಕ್ರಿಯ ಎಚ್ಚರಿಕೆಯ ಸಮಯದಲ್ಲಿ ಸ್ಥಳ ಯಾವಾಗಲೂ ಸೇರಿರುತ್ತದೆ.</string>
     <string name="sharing_preview">ಮುನ್ನೋಟ: ರಕ್ಷಕರು ಏನು ನೋಡುತ್ತಾರೆ</string>
+    <string name="show">ತೋರಿಸಿ</string>
     <string name="sim_dead">ಫೋನ್ ಸ್ಥಗಿತ ಅನುಕರಿಸಿ</string>
     <string name="sim_dead_hint">ಸ್ಥಳ ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ನಿಲ್ಲಿಸುತ್ತದೆ; ವಾಚ್‌ಡಾಗ್ ಸಮಯದ ನಂತರ ಸರ್ವರ್ ಅನುಸರಿಸುವವರಿಗೆ ಎಚ್ಚರಿಕೆ ನೀಡುತ್ತದೆ.</string>
     <string name="sim_dead_msg">ಫೋನ್ ಸ್ಥಗಿತದ ಅನುಕರಣೆ: ಸ್ಥಳ ಅಪ್‌ಡೇಟ್‌ಗಳು ನಿಂತಿವೆ. ಸರ್ವರ್ ವಾಚ್‌ಡಾಗ್ ನಿಮ್ಮ ಅನುಸರಿಸುವವರಿಗೆ ಎಚ್ಚರಿಕೆ ನೀಡುತ್ತದೆ.</string>
@@ -212,6 +244,7 @@
     <string name="sos_button">SOS</string>
     <string name="sos_cancelled">SOS ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ</string>
     <string name="sos_hint">ಮೌನ SOS ಕಳುಹಿಸಲು 2 ಸೆಕೆಂಡ್ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.</string>
+    <string name="sos_hold">ಒತ್ತಿ ಹಿಡಿಯಿರಿ</string>
     <string name="speak">ಓದಿ ಹೇಳಿ</string>
     <string name="st_alert">ಎಚ್ಚರಿಕೆ ಕಳುಹಿಸಲಾಗಿದೆ</string>
     <string name="st_arrived">ತಲುಪಿದೆ</string>
@@ -249,6 +282,17 @@
     <string name="why_notifications">ರಕ್ಷಣೆಯ ಸ್ಥಿತಿ ಮತ್ತು ಬೀಳುವಿಕೆ ಎಚ್ಚರಿಕೆಗಳನ್ನು ತೋರಿಸಲು ಅಗತ್ಯ.</string>
     <string name="why_phone">ಪ್ರಾಥಮಿಕ ಸಂಪರ್ಕಕ್ಕೆ SOS ಕರೆ ಮಾಡಲು ಅಗತ್ಯ.</string>
     <string name="why_sms">ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ ತುರ್ತು ಸಂಪರ್ಕಗಳಿಗೆ SMS ಕಳುಹಿಸಲು ಅಗತ್ಯ.</string>
+    <string name="ws_helplines">ಸಹಾಯವಾಣಿಗಳು</string>
+    <string name="ws_nearby">ಹತ್ತಿರದ ಸಹಾಯ</string>
+    <string name="ws_safe_walk">ಸುರಕ್ಷಿತ ನಡಿಗೆ</string>
+    <string name="ws_shake_off">ಶೇಕ್-ಟು-SOS ಆಫ್ ಆಗಿದೆ</string>
+    <string name="ws_shake_on">ಶೇಕ್-ಟು-SOS ಆನ್ ಆಗಿದೆ</string>
+    <string name="ws_share">ಸ್ಥಳ ಹಂಚಿ</string>
+    <string name="ws_share_msg">ನಾನು ಈಗ ಎಲ್ಲಿದ್ದೇನೆ ಎಂದು ನಿಮಗೆ ತಿಳಿಸಲು ಬಯಸುತ್ತೇನೆ: %s</string>
+    <string name="ws_siren">ಜೋರಾದ ಸೈರನ್</string>
+    <string name="ws_siren_stop">ಸೈರನ್ ನಿಲ್ಲಿಸಿ</string>
+    <string name="ws_sub">ನೀವು ಅಸುರಕ್ಷಿತ ಎನಿಸಿದಾಗ ಬೇಗನೆ ಬಳಸುವ ಸಾಧನಗಳು. ಯಾವುದೇ ಟೈಲ್ ಒತ್ತಿ.</string>
+    <string name="ws_title">ಮಹಿಳಾ ಸುರಕ್ಷತೆ</string>
     <string name="you_are_here">ನೀವು ಇಲ್ಲಿದ್ದೀರಿ</string>
     <string name="your_data">ನಿಮ್ಮ ಡೇಟಾ</string>
 </resources>

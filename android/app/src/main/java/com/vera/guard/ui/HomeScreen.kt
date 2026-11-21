@@ -1,7 +1,6 @@
 package com.vera.guard.ui
 
 import android.Manifest
-import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -9,43 +8,57 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vera.guard.R
 import com.vera.guard.escalation.AlertPhase
@@ -54,27 +67,41 @@ import com.vera.guard.escalation.PinResult
 import com.vera.guard.service.Actions
 import com.vera.guard.service.Perm
 import com.vera.guard.service.ServiceStarter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
 
 private class Step(val title: Int, val why: Int, val granted: (Context) -> Boolean, val request: () -> Unit)
 
+private class Helpline(val number: String, val label: Int)
+
 @Composable
-fun HomeScreen(vm: AppViewModel) {
+fun HomeScreen(vm: AppViewModel, onNavigate: (Int) -> Unit) {
     val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
     val st by vm.coordinator.state.collectAsStateWithLifecycle()
     val s by vm.settings.settings.collectAsStateWithLifecycle()
     val events by vm.events.collectAsStateWithLifecycle()
+    val sensor by vm.sensors.status.collectAsStateWithLifecycle()
+    val sirenOn by vm.siren.on.collectAsStateWithLifecycle()
     var tick by remember { mutableIntStateOf(0) }
     var sliderScore by remember { mutableFloatStateOf(70f) }
+    var showHelplines by remember { mutableStateOf(false) }
+    var showFakeCall by remember { mutableStateOf(false) }
+    var showChecklist by remember { mutableStateOf(false) }
+    var nowMs by remember { mutableLongStateOf(android.os.SystemClock.elapsedRealtime()) }
+    val history = remember { mutableStateListOf<Float>() }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
         val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) { tick++; vm.refreshEvents() } }
         lifecycle.addObserver(obs); onDispose { lifecycle.removeObserver(obs) }
     }
+    LaunchedEffect(Unit) { while (true) { nowMs = android.os.SystemClock.elapsedRealtime(); delay(1000) } }
+    LaunchedEffect(sensor.lastSampleMs) { if (sensor.lastSampleMs > 0) { history.add(sensor.g); while (history.size > 80) history.removeAt(0) } }
+    val live = sensor.running && sensor.hasAccel && nowMs - sensor.lastSampleMs < 3000
     val multi = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { tick++; try { ServiceStarter.start(ctx, Actions.START) } catch (e: Exception) { } }
     val single = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { tick++; try { ServiceStarter.start(ctx, Actions.START) } catch (e: Exception) { } }
-    val act = ctx as Activity
     fun openSettings(intent: Intent) { try { ctx.startActivity(intent) } catch (e: Exception) { ctx.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}"))) } }
 
     val steps = listOf(
@@ -92,17 +119,18 @@ fun HomeScreen(vm: AppViewModel) {
     val states = remember(tick) { steps.map { it.granted(ctx) } }
     // Critical = notifications, location, SMS. The rest improve reliability.
     val active = states[0] && states[1] && states[3]
+    val ready = states.count { it }
     val critical = listOf(0, 1, 3)
 
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Black)
-        SectionCard {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (active) "✅" else "⚠️", fontSize = 28.sp)
-                Column(Modifier.padding(start = 10.dp)) {
-                    Text(stringResource(if (active) R.string.protection_active else R.string.protection_incomplete), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = if (active) VeraGreen else VeraAmber)
-                    Text(stringResource(R.string.protection_hint), style = MaterialTheme.typography.bodySmall)
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        // ---- hero
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(BrandBrush).padding(20.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.app_name), color = Color.White, style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(R.string.hero_tagline), color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp)
                 }
+                StatusPill(stringResource(if (active) R.string.pill_protected else R.string.pill_setup), if (active) VeraGreen else VeraAmber, pulsing = active)
             }
         }
         if (s.demoMode) SectionCard { Text(stringResource(R.string.demo_banner), color = VeraAmber, fontWeight = FontWeight.Bold); Text(stringResource(R.string.demo_hint), style = MaterialTheme.typography.bodySmall) }
@@ -123,33 +151,72 @@ fun HomeScreen(vm: AppViewModel) {
             }
         }
 
-        Button(
-            onClick = { try { ServiceStarter.start(ctx, if (s.demoMode) Actions.SIM_SOS else Actions.SOS) } catch (e: Exception) { } },
-            modifier = Modifier.fillMaxWidth().height(110.dp), colors = ButtonDefaults.buttonColors(containerColor = VeraRed),
-        ) { Text(stringResource(R.string.sos_button), fontSize = 40.sp, fontWeight = FontWeight.Black, color = Color.White) }
-        Text(stringResource(R.string.sos_hint), style = MaterialTheme.typography.bodySmall)
+        // ---- SOS
+        SosButton(stringResource(R.string.sos_button), stringResource(R.string.sos_hold), onActivated = {
+            try { ServiceStarter.start(ctx, if (s.demoMode) Actions.SIM_SOS else Actions.SOS) } catch (e: Exception) { }
+        })
+        Text(stringResource(R.string.sos_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
 
+        // ---- live motion sensors
+        SectionCard(stringResource(R.string.sensor_title)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                StatusPill(stringResource(if (live) R.string.sensor_live else R.string.sensor_off), if (live) VeraGreen else VeraAmber, pulsing = live)
+                if (!live) OutlinedButton(onClick = { try { ServiceStarter.start(ctx, Actions.START) } catch (e: Exception) { } }) { Text(stringResource(R.string.sensor_start)) }
+            }
+            if (!sensor.hasAccel) Text(stringResource(R.string.sensor_none), color = VeraRed, fontWeight = FontWeight.SemiBold)
+            else {
+                SensorMonitor(
+                    sensor, live, history, stringResource(R.string.sensor_force), stringResource(R.string.sensor_rotation), stringResource(R.string.sensor_state),
+                    stringResource(when (sensor.detector) {
+                        "FREE_FALL" -> R.string.det_freefall; "IMPACT" -> R.string.det_impact; "STILLNESS_CHECK" -> R.string.det_still
+                        "CONFIRMING" -> R.string.det_confirm; "ALERTING" -> R.string.det_alert; else -> R.string.det_idle
+                    }),
+                )
+                if (!sensor.hasGyro) Text(stringResource(R.string.sensor_nogyro), style = MaterialTheme.typography.bodySmall, color = VeraAmber)
+                Text(stringResource(R.string.sensor_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+
+        // ---- women's safety toolkit
+        SectionCard(stringResource(R.string.ws_title)) {
+            Text(stringResource(R.string.ws_sub), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            StatusPill(stringResource(if (s.shakeEnabled) R.string.ws_shake_on else R.string.ws_shake_off), if (s.shakeEnabled) VeraTeal else VeraAmber)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ActionTile(Icons.Filled.Call, stringResource(R.string.fake_call), VeraIndigo, Modifier.weight(1f)) { showFakeCall = true }
+                ActionTile(Icons.Filled.Notifications, stringResource(if (sirenOn) R.string.ws_siren_stop else R.string.ws_siren), VeraRed, Modifier.weight(1f), active = sirenOn) { vm.siren.toggle() }
+                ActionTile(Icons.Filled.Share, stringResource(R.string.ws_share), VeraTeal, Modifier.weight(1f)) {
+                    scope.launch {
+                        val fix = vm.loc.current(7000)
+                        if (fix == null) Toast.makeText(ctx, ctx.getString(R.string.no_location), Toast.LENGTH_LONG).show()
+                        else {
+                            val link = "https://maps.google.com/?q=${fix.latitude},${fix.longitude}"
+                            ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, ctx.getString(R.string.ws_share_msg, link)), null))
+                        }
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ActionTile(NavigationIcon, stringResource(R.string.ws_safe_walk), VeraViolet, Modifier.weight(1f)) { onNavigate(2) }
+                ActionTile(Icons.Filled.LocationOn, stringResource(R.string.ws_nearby), VeraAmber, Modifier.weight(1f)) { onNavigate(1) }
+                ActionTile(Icons.Filled.Phone, stringResource(R.string.ws_helplines), VeraGreen, Modifier.weight(1f)) { showHelplines = true }
+            }
+        }
+
+        // ---- setup checklist
         SectionCard(stringResource(R.string.setup_checklist)) {
-            steps.forEachIndexed { i, step ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.checklist_progress, ready, steps.size), color = if (ready == steps.size) VeraGreen else VeraAmber, fontWeight = FontWeight.SemiBold)
+                TextButton(onClick = { showChecklist = !showChecklist }) { Text(stringResource(if (showChecklist) R.string.hide else R.string.show)) }
+            }
+            if (showChecklist || ready < steps.size) steps.forEachIndexed { i, step ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text((if (states[i]) "✅ " else "⬜ ") + stringResource(step.title) + if (i in critical) "" else "", fontWeight = FontWeight.SemiBold)
-                        Text(stringResource(step.why), style = MaterialTheme.typography.bodySmall)
+                        Text((if (states[i]) "✅ " else "⬜ ") + stringResource(step.title) + if (i in critical) " *" else "", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(step.why), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (!states[i]) OutlinedButton(onClick = { step.request() }) { Text(stringResource(R.string.grant)) }
                 }
             }
-        }
-
-        SectionCard(stringResource(R.string.tools)) {
-            var delaySec by remember { mutableIntStateOf(5) }
-            Text(stringResource(R.string.fake_call), fontWeight = FontWeight.SemiBold)
-            ChipRow(listOf(0 to "0s", 5 to "5s", 15 to "15s", 30 to "30s"), delaySec) { delaySec = it }
-            Button(onClick = {
-                val name = s.fakeCallName
-                val i = Intent(ctx, FakeCallActivity::class.java).putExtra("name", name).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ try { ctx.startActivity(i) } catch (e: Exception) { } }, delaySec * 1000L)
-            }) { Text(stringResource(R.string.start_fake_call)) }
         }
 
         if (s.demoMode) {
@@ -163,13 +230,60 @@ fun HomeScreen(vm: AppViewModel) {
         }
 
         SectionCard(stringResource(R.string.event_log)) {
-            if (events.isEmpty()) Text(stringResource(R.string.no_events), style = MaterialTheme.typography.bodySmall)
+            if (events.isEmpty()) Text(stringResource(R.string.no_events), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             events.take(8).forEach { e ->
                 Text("${DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(e.ts))} · ${e.type.uppercase()}" + (if (e.severity != null) " · ${e.severity} ${e.score}/100" else ""), style = MaterialTheme.typography.bodyMedium)
                 e.trackUrl?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
             }
         }
-        Text(stringResource(R.string.disclaimer_emergency), style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.disclaimer_emergency), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+
+    if (showFakeCall) {
+        var delaySec by remember { mutableIntStateOf(5) }
+        AlertDialog(
+            onDismissRequest = { showFakeCall = false },
+            title = { Text(stringResource(R.string.fake_call)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.fc_ring_in), style = MaterialTheme.typography.labelMedium)
+                    ChipRow(listOf(0 to "0 s", 5 to "5 s", 15 to "15 s", 30 to "30 s"), delaySec) { delaySec = it }
+                    Text(stringResource(R.string.fc_hint, s.fakeCallName), style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showFakeCall = false
+                    val i = Intent(ctx, FakeCallActivity::class.java).putExtra("name", s.fakeCallName).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ try { ctx.startActivity(i) } catch (e: Exception) { } }, delaySec * 1000L)
+                }) { Text(stringResource(R.string.start_fake_call)) }
+            },
+            dismissButton = { TextButton(onClick = { showFakeCall = false }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
+
+    if (showHelplines) {
+        val lines = listOf(
+            Helpline("112", R.string.hl_112), Helpline("181", R.string.hl_181), Helpline("1091", R.string.hl_1091), Helpline("100", R.string.hl_100),
+            Helpline("108", R.string.hl_108), Helpline("1098", R.string.hl_1098), Helpline("1930", R.string.hl_1930),
+        )
+        AlertDialog(
+            onDismissRequest = { showHelplines = false },
+            title = { Text(stringResource(R.string.ws_helplines)) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    lines.forEach { h ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                                Text(h.number, style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(h.label), style = MaterialTheme.typography.bodySmall)
+                            }
+                            OutlinedButton(onClick = { try { ctx.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + h.number))) } catch (e: Exception) { } }) { Text(stringResource(R.string.call)) }
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showHelplines = false }) { Text(stringResource(R.string.close)) } },
+        )
     }
 }
-

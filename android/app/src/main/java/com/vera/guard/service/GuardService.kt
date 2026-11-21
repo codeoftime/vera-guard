@@ -87,6 +87,8 @@ class GuardService : Service(), SensorEventListener {
     @Inject lateinit var journeys: JourneyCoordinator
     @Inject lateinit var loc: LocationHelper
     @Inject lateinit var sms: SmsSender
+    @Inject lateinit var hub: SensorHub
+    private var lastHubAt = 0L
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var sensors: SensorManager
@@ -126,8 +128,11 @@ class GuardService : Service(), SensorEventListener {
 
     private fun registerSensors() {
         sensors.unregisterListener(this)
-        sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
-        sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        val acc = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val gyr = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        val okA = acc?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) } ?: false
+        gyr?.let { sensors.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME) }
+        hub.update { it.copy(running = okA, hasAccel = acc != null, hasGyro = gyr != null) }
     }
 
     private fun applySettings() {
@@ -166,6 +171,13 @@ class GuardService : Service(), SensorEventListener {
         if (e.sensor.type != Sensor.TYPE_ACCELEROMETER) return
         val s = Sample(e.timestamp / 1_000_000L, e.values[0], e.values[1], e.values[2], gx, gy, gz)
         val cfg = settings.current
+        val nowMs = android.os.SystemClock.elapsedRealtime()
+        if (nowMs - lastHubAt >= 200) {
+            lastHubAt = nowMs
+            val gx9 = s.ax / com.vera.guard.detect.DetectionConfig.G; val gy9 = s.ay / com.vera.guard.detect.DetectionConfig.G
+            val dps = s.gyro * 57.29578f
+            hub.update { it.copy(running = true, g = s.g, ax = gx9, ay = gy9, gyroDps = dps, detector = detector.state.name, lastSampleMs = nowMs) }
+        }
         if (cfg.shakeEnabled && !sosActive && shake.onSample(s)) { triggerSos(simulate = false); return }
         if (!cfg.fallEnabled) return
         if (detector.state == DetectorState.ALERTING) return
@@ -539,6 +551,7 @@ class GuardService : Service(), SensorEventListener {
     private fun releaseWakeLock() { try { if (wakeLock?.isHeld == true) wakeLock?.release() } catch (e: Exception) { }; wakeLock = null }
 
     override fun onDestroy() {
+        hub.update { it.copy(running = false) }
         sensors.unregisterListener(this)
         feedback?.stop(); stopKeyword(); releaseWakeLock(); scope.cancel()
         super.onDestroy()

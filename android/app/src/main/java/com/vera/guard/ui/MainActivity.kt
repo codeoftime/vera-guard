@@ -15,7 +15,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -56,6 +67,15 @@ class MainActivity : FragmentActivity() {
         setContent {
             val vm: AppViewModel = hiltViewModel()
             val s by vm.settings.settings.collectAsStateWithLifecycle()
+            val dark = isVeraDark(s.theme)
+            DisposableEffect(dark) {
+                val t = android.graphics.Color.TRANSPARENT
+                enableEdgeToEdge(
+                    statusBarStyle = if (dark) SystemBarStyle.dark(t) else SystemBarStyle.light(t, t),
+                    navigationBarStyle = if (dark) SystemBarStyle.dark(t) else SystemBarStyle.light(t, t),
+                )
+                onDispose { }
+            }
             VeraTheme(s.theme) {
                 var unlocked by rememberSaveable { mutableStateOf(false) }
                 if (s.appLock && !unlocked) LockGate { unlocked = true } else AppRoot(vm)
@@ -91,12 +111,18 @@ private fun AppRoot(vm: AppViewModel) {
     // Make sure the protection service is running whenever the app is opened.
     LaunchedEffect(Unit) { try { ServiceStarter.start(ctx, Actions.START) } catch (e: Exception) { } }
     val labels = listOf(R.string.tab_home, R.string.tab_nearby, R.string.tab_journey, R.string.tab_chat, R.string.tab_profile)
-    val icons = listOf("🛡", "🏥", "🧭", "💬", "👤")
+    val icons: List<ImageVector> = listOf(Icons.Filled.Home, Icons.Filled.LocationOn, NavigationIcon, Icons.Filled.Face, Icons.Filled.Person)
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 0.dp) {
                 labels.forEachIndexed { i, l ->
-                    NavigationBarItem(selected = tab == i, onClick = { tab = i }, icon = { Text(icons[i]) }, label = { Text(stringResource(l), maxLines = 1) })
+                    NavigationBarItem(
+                        selected = tab == i, onClick = { tab = i },
+                        icon = { Icon(icons[i], contentDescription = null) },
+                        label = { Text(stringResource(l), maxLines = 1) },
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer),
+                    )
                 }
             }
         },
@@ -110,7 +136,7 @@ private fun AppRoot(vm: AppViewModel) {
                 }
                 Box(Modifier.weight(1f)) {
                     when (tab) {
-                        0 -> HomeScreen(vm)
+                        0 -> HomeScreen(vm, onNavigate = { tab = it })
                         1 -> NearbyScreen(vm)
                         2 -> JourneyScreen(vm)
                         3 -> ChatScreen(vm, onNavigate = { tab = it })
